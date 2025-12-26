@@ -16,7 +16,8 @@ Start-Sleep 2
 # Import the trace as CSV
 $csv = Import-Csv -Path "$etlFile.csv"
 # Get the ref time at which the user dismisses the lock screen 
-$refStartSigninRow = $csv | Sort-Object "Clock-Time" -Descending | Where-Object { $_."Event Name" -eq "CLogonController_WaitForLockScreenDismiss_Activity" } | Select-Object -First 1
+$refStartSigninRow = $csv | Sort-Object "Clock-Time" -Descending | Where-Object { $_."Event Name" -in @("CLogonController_WaitForLockScreenDismiss_Activity","CLockAction__SuspendOrResumeLockAppShownWatchdogTimer_Activity") } | Select-Object -First 1
+$refStartSigninTimeEvent = [string] $refStartSigninRow."Event Name"
 $refStartSigninTime = [DateTime]::FromFileTimeUtc($refStartSigninRow.'Clock-Time')
 $refStartSigninTimeTS = $refStartSigninTime.ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ")
 
@@ -68,6 +69,7 @@ $GUIDProvidersMapping = @{
 
 $eventPaylod = @{
     "refStartSigninTimeUtc" = $refStartSigninTimeTS
+    "refStartSigninTimeEvent" = $refStartSigninTimeEvent
     "SigninDurationMs" = [string] ($lastSigninEventTime - $refStartSigninTime).TotalMilliseconds
     "SigninEventTimeUtc" = $lastSigninEventTimeTS
     "SigninEventSID" = $lastSigninEventSID
@@ -86,5 +88,5 @@ Write-EventLog -LogName Application `
 
 # Start the trace again
 
-logman start "$TraceName" -ow -o C:\temp\Crd.etl -nb 16 16 -bs 1024 -mode Circular -f bincirc -max 8 -ets
+logman start "$TraceName" -ow -o $etlFile -nb 16 16 -bs 1024 -mode Circular -f bincirc -max 8 -ets
 logman update trace "$TraceName" -p "{4F7C073A-65BF-5045-7651-CC53BB272DB5}" "0xffffffffffffffff" "0xff" -ets
