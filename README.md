@@ -9,16 +9,16 @@ The solution consists of two PowerShell scripts executed by two scheduled tasks:
 The first scheduled task runs at startup. It does the following:
 1. If the `C:\CollectSigninPerformanceData` does not exist, it creates it. That is where the scripts and the ETL traces will be saved.
 2. If the `SigninPerformanceData` provider doesn't exist, it creates it. The solution uses the `Application` eventlog to generate events with statistics.
-3. Starts and update an ETL trace for the provider `{4F7C073A-65BF-5045-7651-CC53BB272DB5}`. It uses `logman.exe`.
+3. It starts and updates an ETL trace for the provider `{4F7C073A-65BF-5045-7651-CC53BB272DB5}`. It uses `logman.exe`.
 
 Then at user logon and worksation unlock, the second scheduled task starts. It does the following:
 1. It stops the ETL trace using `logman.exe`.
-2. It convert it into a CSV file in the same folder using `tracerpt.exe`.
-3. It extract the time at which the credential providers are proposed for authentication from the trace.
+2. It converts it into a CSV file in the same folder using `tracerpt.exe`.
+3. It extracts the time at which the credential providers are proposed for authentication from the trace.
 4. It looks for the succesful sign-in time in the `Security` eventlog.
 5. It extracts the credential provider used for the signin from the registry key `LogonUI`.
 6. It generates the event 2 in the `Application` eventlog with the statistics for the signin.
-7. It restart the ETL trace using `logman.exe`.
+7. It restarts the ETL trace using `logman.exe`.
 
 
 ### Installation
@@ -28,7 +28,7 @@ Register the first scheduled task `Set-SigninPerformanceData`:
 Register-ScheduledTask -Xml (Get-Content -Path "Set-SigninPerformanceData.xml" -Raw)
 ```
 
-Register the seconf scheduled task `Get-SigninPerformanceData`:
+Register the second scheduled task `Get-SigninPerformanceData`:
 ```PowerShell
 Register-ScheduledTask -Xml (Get-Content -Path "Get-SigninPerformanceData.xml" -Raw)
 ```
@@ -59,6 +59,27 @@ Example of event 2 with statistics:
     "CredentialProviderGUID":  "{8AF662BF-65A0-4D0A-A540-A338A999D36F}"
 }
 ```
+
+### Extract statistics
+
+You can collect the event 2 from the source `SigninPerformanceData` in the `Application` eventlog.
+
+Example in PowerShell:
+
+```PowerShell
+Get-WinEvent -FilterHashtable @{ LogName = "Application"; ProviderName = "SigninPerformanceData"; ID = 2} | ForEach-Object { $_.Message | ConvertFrom-Json } | Format-Table SigninEventTimeUtc, SigninEventUPN, SigninEventLogonType, CredentialProviderName, SigninDurationMs
+```
+
+Example of output:
+
+```
+SigninEventTimeUtc           SigninEventUPN         SigninEventLogonType CredentialProviderName  SigninDurationMs
+------------------           --------------         -------------------- ----------------------  ----------------
+2025-12-27T00:21:13.3495967Z johndo@contoso.com CachedInteractive    FaceCredentialProvider  245.1285
+2025-12-27T00:09:19.6006947Z johndo@contoso.com CachedInteractive    FaceCredentialProvider  725.832
+2025-12-26T23:44:40.6393386Z johndo@contoso.com CachedInteractive    NGC Credential Provider 6518.9403
+```
+
 
 ### Security considerations
 
