@@ -1,6 +1,6 @@
 
 
-$etlFile = "C:\temp\Crd.etl"
+$etlFile = "C:\CollectSigninPerformanceData\Crd.etl"
 $TraceName = "CollectSigninPerformanceData"
 
 # Stop the trace

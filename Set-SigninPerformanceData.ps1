@@ -1,6 +1,12 @@
 ﻿
-$etlFile = "C:\temp\Crd.etl"
+$etlFile = "C:\CollectSigninPerformanceData\Crd.etl"
 $TraceName = "CollectSigninPerformanceData"
+
+$folder = "C:\CollectSigninPerformanceData"
+if (-not (Test-Path -Path $folder)) {
+    New-Item -Path $folder -ItemType Directory | Out-Null
+}
+
 
 if ( -not [System.Diagnostics.EventLog]::SourceExists('SigninPerformanceData') )
 {
