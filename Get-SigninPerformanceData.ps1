@@ -6,12 +6,8 @@ $TraceName = "CollectSigninPerformanceData"
 # Stop the trace
 logman stop "$TraceName" -ets 
 
-Start-Sleep 2
-
 # Convert the trace
 tracerpt.exe $etlFile -o "$etlFile.csv" -of CSV -en ANSI -y
-
-Start-Sleep 2
 
 # Import the trace as CSV
 $csv = Import-Csv -Path "$etlFile.csv"
