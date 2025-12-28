@@ -92,4 +92,5 @@ As the scheduled tasks run as `SYSTEM` it is important to keep the scripts in a 
 🔲 Implement proper error management    
 🔲 Parameterize the file path for smoother deployment    
 🔲 Give an example of how to deploy it via group policy and/or Intune    
-🔲 Improve stats collection when the device comes back from hibernation (find better event than `CLockAction__SuspendOrResumeLockAppShownWatchdogTimer_Activity`)
+🔲 Improve stats collection when the device comes back from hibernation (find better event than `CLockAction__SuspendOrResumeLockAppShownWatchdogTimer_Activity`)   
+🔲 Implement alternative logging methods instead of the event based one (CSV output, direct ingest to a centralized place - such as SYSVOL)
