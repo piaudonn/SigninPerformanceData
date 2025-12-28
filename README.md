@@ -13,7 +13,7 @@ The first scheduled task runs at startup. It does the following:
 
 Then at user logon and worksation unlock, the second scheduled task starts. It does the following:
 1. It stops the ETL trace using `logman.exe`.
-2. It converts it into a CSV file in the same folder using `tracerpt.exe`.
+2. It converts it into a CSV file in the same folder using `tracerpt.exe`. An example of the trace is available here: [Crd.etl.csv](Crd.etl.csv) you can validate that no sensitive data get captured.
 3. It extracts the time at which the credential providers are proposed for authentication from the trace.
 4. It looks for the succesful sign-in time in the `Security` eventlog.
 5. It extracts the credential provider used for the signin from the registry key `LogonUI`.
