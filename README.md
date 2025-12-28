@@ -23,6 +23,8 @@ Then at user logon and worksation unlock, the second scheduled task starts. It d
 
 ### Installation
 
+Downlaod the xml and the ps1 files and save them under `C:\CollectSigninPerformanceData`. This path is hardcoded in the scripts and the scheduled tasks. You can change it but you will need to update it everywhere. 
+
 Register the first scheduled task `Set-SigninPerformanceData`:
 ```PowerShell
 Register-ScheduledTask -Xml (Get-Content -Path "Set-SigninPerformanceData.xml" -Raw)
@@ -84,3 +86,10 @@ SigninEventTimeUtc           SigninEventUPN         SigninEventLogonType Credent
 ### Security considerations
 
 As the scheduled tasks run as `SYSTEM` it is important to keep the scripts in a path where only local administrators have access.
+
+### TO-DO
+
+🔲 Implement proper error management    
+🔲 Parameterize the file path for smoother deployment    
+🔲 Give an example of how to deploy it via group policy and/or Intune    
+🔲 Improve stats collection when the device comes back from hibernation (find better event than `CLockAction__SuspendOrResumeLockAppShownWatchdogTimer_Activity`)
